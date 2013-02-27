@@ -9,11 +9,14 @@ it will work fine on Linux for performing work directly on your
 server(s). I'm not a Haskell expert so that's the part that you'll have
 to venture on your own.
 
-#OSX
-#Homebrew
-#Haskell (runghc, cabal). See install script for more info.
-#Ruby 1.9
-#bundler 
+* OSX
+* Homebrew
+* Haskell (runghc, cabal). See install script for more info.
+* Ruby 1.9
+* Bundler 
+* mysql client
+* psql client
+* network connectivity to both MySQL and PostgreSQL servers
 
 
 ## Configure
@@ -99,4 +102,6 @@ MyMigrate.config like so:
 
 ## Credits
 
+Thanks to @danchoi for creating Haskell parse program to do DDL
+transformation at https://github.com/danchoi/mysql-ddl-parser
 

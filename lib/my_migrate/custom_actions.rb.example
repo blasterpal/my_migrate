@@ -1,0 +1,22 @@
+module MyMigrate
+  module CustomActions 
+    
+    def fix_timestamps_in_mysql_ddl
+      %( sed "s/DEFAULT '1970-01-01 00:00:0[0,1]'//g" ddl/mysql.ddl > ddl/mysql.ddl)
+    end
+    
+    def update_synchronized_time
+      %(sed -i 'bak' 's/"synchronized_at" timestamp with time zone/"synchronized_at" timestamp with time zone default "1970-01-01 00:00:01+00"/g' ddl/postgres-noidx.ddl)
+    end
+    
+    def update_other_timestamps
+      fields = %w(synchronize_begin_at creative_updated_at targeting_updated_at image_updated_at adgroup_data_updated_at)
+      cmds = [] 
+      fields.each do |field|
+        cmds << %(sed -i "bak" 's/"#{field}" timestamp with time zone/"#{field}" timestamp with time zone default "1970-01-01 00:00:00+00"/g' ddl/postgres-noidx.ddl)
+      end
+      cmds
+    end 
+
+  end
+end

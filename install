@@ -1,0 +1,8 @@
+cabal install parsec
+cabal install libpq
+cabal install postgresql-libpq
+cabal install hdbc
+cabal install hdbc-postgresql
+cabal install hdbc-mysql
+cabal install iconv
+* cabal install charsetdetect

@@ -1,0 +1,8 @@
+dumps/*
+ddl/*
+.config
+config.yml
+local/*
+lib/my_migrate/custom_actions.rb
+.requirements.met
+

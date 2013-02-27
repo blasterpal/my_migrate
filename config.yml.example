@@ -1,0 +1,32 @@
+---
+dry_run: false
+stop_on_error: false
+source:
+  username: root
+  password: foo
+  database: myapp_development
+  hostname: localhost
+  fields_terminated_by: "|"
+  fields_enclosed_by: "^" 
+  replace_null_string: "NULL" #you should probably leave this
+
+target:
+  username: myuser
+  password:
+  database: myapp_development
+  hostname: localhost
+  
+
+# The order is important, it's serial
+actions_set:
+  - dump_mysql_ddl
+  - convert_mysql_ddl_to_postgres
+  - split_indexes_from_postgres
+  - split_ddl_from_postgres
+  - dump_mysql
+  - fix_nulls
+  - drop_create_target
+  - load_postgres_ddl
+  - load_csvs
+  - load_postgres_indexes
+

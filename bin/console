@@ -1,0 +1,8 @@
+#!/usr/bin/env ruby
+require File.expand_path("boot")
+require 'pry'
+MyMigrate.actions
+# TODO get rid of pry line trace at start
+Pry.start
+
+

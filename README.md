@@ -2,6 +2,8 @@
 
 A Simple REPL tool to migrate from MySQL to PostgreSQL. 
 
+![MyMigrate screenshot](http://hbeaver-www.s3.amazonaws.com/my_migrate_example.png)
+
 Migrating from MySQL to PostgreSQL is not completely straightforward. Based on my
 experience, I'm not certain if it's possible to have one tool that's
 preconfigured to reliably migrate 100% of time without any tweaking. 

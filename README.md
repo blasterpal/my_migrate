@@ -1,6 +1,6 @@
 # MyMigrate
 
-A Simple REPL tool to migrate from MySQL to PostgreSQL. 
+A Simple REPL tool to migrate from MySQL to PostgreSQL. (Beta)
 
 ![MyMigrate screenshot](http://hbeaver-www.s3.amazonaws.com/my_migrate_example.png)
 

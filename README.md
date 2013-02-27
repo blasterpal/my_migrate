@@ -2,6 +2,13 @@
 
 A Simple REPL tool to migrate from MySQL to PostgreSQL. 
 
+Migrating from MySQL to PostgreSQL is not completely straightforward. Based on my
+experience, I'm not certain if it's possible to have one tool that's
+preconfigured to reliably migrate 100% of time without any tweaking. 
+
+This tool is meant to address some of this. It's simply a small
+framework to get you running a lot faster in your migration. Good luck!
+
 ## Requirements
 
 This tool has been created and tested on OSX, however it's very likely

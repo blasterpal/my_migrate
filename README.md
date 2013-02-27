@@ -21,8 +21,9 @@ to venture on your own.
 
 ## Configure
 
-Copy config.yml.example to config.yml to your environment and needs. 
-Copy lib/my_migrate/custom_actions.rb to lib/my_migrate/custom_actions.rb and tweak, see below.
+* Copy config.yml.example to config.yml adjust to your environment and needs. 
+
+* Copy lib/my_migrate/custom_actions.rb to lib/my_migrate/custom_actions.rb and tweak, see below.
 
 ## Actions
 
@@ -61,6 +62,9 @@ Then bundle
 
     bundle exec bin/console
 
+You should see the Pry prompt.
+
+    [1] pry(main)> 
 
 ## MyMigrate and actions
 
@@ -70,7 +74,17 @@ Hashie Gem.
 
 To list the actions: 
 
-    MyMigrate.actions
+    [1] pry(main)> MyMigrate.actions.list
+    => ["dump_mysql_ddl",
+     "fix_timestamps_in_mysql_ddl",
+     "convert_mysql_ddl_to_postgres",
+     "split_indexes_from_postgres",
+     "split_ddl_from_postgres",
+     "dump_mysql",
+     "fix_nulls",
+     "drop_create_target", "load_postgres_ddl",
+     "load_csvs",
+     "load_postgres_indexes"]
 
 To see the config:
 

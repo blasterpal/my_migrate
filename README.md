@@ -1,4 +1,4 @@
-# MyMigrate - WIP
+# MyMigrate
 
 A Simple REPL tool to migrate from MySQL to PostgreSQL. 
 
@@ -121,8 +121,18 @@ MyMigrate.config like so:
 
     MyMigrate.actions.run 'load_csvs'
 
+## Note on Patches/Pull Requests
+
+* Fork the project.
+* Make your feature addition or bug fix.
+* Add tests for it, tests are a WIP, this tool is a very specific use case.
+* Send me a pull request. Bonus points for topic branches.
+
 ## Credits
 
 Thanks to @danchoi for creating Haskell parse program to do DDL
 transformation at https://github.com/danchoi/mysql-ddl-parser
 
+## Copyright
+
+Copyright (c) 2013 Hank Beaver and Obie Fernandez

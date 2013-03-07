@@ -58,6 +58,7 @@ restart the console and you are good to go.
 
 Haskell for using DDL converter ( https://github.com/danchoi/mysql-ddl-parser).
 
+    brew install parallel
     brew install ghc --64bit --use-llvm
     brew install haskell-platform --64bit --use-llvm
     cd my_migrate

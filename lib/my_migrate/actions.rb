@@ -64,10 +64,15 @@ module MyMigrate
       %(cat ddl/postgres.ddl | grep -v 'create index' > ddl/postgres-noidx.ddl)
     end
 
-
+    
+    # parallel dump
     def dump_mysql
       cmds = []
-      cmds << %(cd dumps; #{mysqldump_conn} --compatible=postgresql -T './' --fields-terminated-by='#{@config.source.fields_terminated_by}' --fields-enclosed-by='#{@config.source.fields_enclosed_by}';)
+      this_command = %(cd dumps;)
+      this_command += %( #{mysql_conn} -B -e 'SHOW TABLES' | sed -e '$!N; s/Tables_in_.*//' | )
+      this_command += %( parallel -j+0 "#{mysqldump_conn} --compatible=postgresql -T './' --fields-terminated-by='#{@config.source.fields_terminated_by}' --fields-enclosed-by='#{@config.source.fields_enclosed_by}' --tables {}" )
+      #cmds << %(cd dumps; #{mysqldump_conn} --compatible=postgresql -T './' --fields-terminated-by='#{@config.source.fields_terminated_by}' --fields-enclosed-by='#{@config.source.fields_enclosed_by}';)
+      this_command
     end
 
     def load_postgres_ddl
@@ -131,6 +136,15 @@ module MyMigrate
     end
 
     protected
+    
+    def mysql_conn
+      if @config.source.password
+        %(mysql -u#{@config.source.username} -p#{@config.source.password} -h #{@config.source.hostname} #{@config.source.database} )
+      else
+        %(mysql -u#{@config.source.username} -h #{@config.source.hostname} #{@config.source.database} )
+      end
+
+    end
 
     def mysqldump_conn
       if @config.source.password

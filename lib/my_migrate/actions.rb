@@ -65,14 +65,18 @@ module MyMigrate
     end
 
     
-    # parallel dump
+    # parallel dump, seems stable
     def dump_mysql
       cmds = []
       this_command = %(cd dumps;)
       this_command += %( #{mysql_conn} -B -e 'SHOW TABLES' | sed -e '$!N; s/Tables_in_.*//' | )
-      this_command += %( parallel -j+0 "#{mysqldump_conn} --compatible=postgresql -T './' --fields-terminated-by='#{@config.source.fields_terminated_by}' --fields-enclosed-by='#{@config.source.fields_enclosed_by}' --tables {}" )
-      #cmds << %(cd dumps; #{mysqldump_conn} --compatible=postgresql -T './' --fields-terminated-by='#{@config.source.fields_terminated_by}' --fields-enclosed-by='#{@config.source.fields_enclosed_by}';)
+      this_command += %( parallel --progress -j+0 "#{mysqldump_conn} --compatible=postgresql -T './' --fields-terminated-by='#{@config.source.fields_terminated_by}' --fields-enclosed-by='#{@config.source.fields_enclosed_by}' --tables {}" )
       this_command
+    end
+
+    def compress_mysql_dumps
+      # wack the sql files
+      # use a parallel compression tool: http://letsgetdugg.com/2010/01/18/speedy-postgresql-parallel-compression-dumps/
     end
 
     def load_postgres_ddl
@@ -88,16 +92,31 @@ module MyMigrate
       end
     end
 
-    def load_csvs
+    def parallel_load_csvs
       cmds = []
       path = File.join(Dir.pwd,'dumps')
       csvs = Dir["#{path}/*.txt"]
-      csvs.each do |csv|
-       puts "importing #{csv}..."
-       cmds << %(#{psql_conn} -c "COPY #{File.basename(csv,'.txt')}  from '#{csv}' delimiter as '#{@config.source.fields_terminated_by}' NULL '#{@config.source.replace_null_string}' csv QUOTE as '#{@config.source.fields_enclosed_by}';")
+      File.open('/tmp/mm_pg_load_csvs','w') do |f|
+        csvs.each do |csv|
+         puts "importing #{csv}..."
+         #make a command file, easier than shell quoting escape hell
+         psql_cmd = %(COPY #{File.basename(csv,'.txt')}  from '#{csv}' delimiter as '#{@config.source.fields_terminated_by}' NULL '#{@config.source.replace_null_string}' csv QUOTE as '#{@config.source.fields_enclosed_by}';) 
+         f << "#{psql_cmd}\n"
+        end
       end
-      cmds
+      cmds << %(cd dumps; cat /tmp/mm_pg_load_csvs| parallel --progress  -j+0 "#{psql_conn} -c {}") 
     end
+
+   def load_csvs
+        cmds = []
+        path = File.join(Dir.pwd,'dumps')
+        csvs = Dir["#{path}/*.txt"]
+        csvs.each do |csv|
+         puts "importing #{csv}..."
+         cmds << %(#{psql_conn} -c "COPY #{File.basename(csv,'.txt')}  from '#{csv}' delimiter as '#{@config.source.fields_terminated_by}' NULL '#{@config.source.replace_null_string}' csv QUOTE as '#{@config.source.fields_enclosed_by}';")
+        end
+        cmds
+      end
     
     def load_postgres_indexes
       %(#{psql_conn} < ddl/postgres-idx.ddl)

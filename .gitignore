@@ -5,4 +5,4 @@ config.yml
 local/*
 lib/my_migrate/custom_actions.rb
 .requirements.met
-
+.DS_Store

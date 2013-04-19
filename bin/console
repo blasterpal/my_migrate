@@ -3,6 +3,6 @@ require File.expand_path("boot")
 require 'pry'
 MyMigrate.actions
 # TODO get rid of pry line trace at start
+puts "Type MyMigrate.help for more info"
 Pry.start
-
 

@@ -63,7 +63,14 @@ module MyMigrate
     def split_ddl_from_postgres
       %(cat ddl/postgres.ddl | grep -v 'create index' > ddl/postgres-noidx.ddl)
     end
-
+  
+    
+    # Unfortunately Mysql + ActiveRecord will allow a string column to behave like an int column. 
+    # This does not carry over into PostgreSQL
+    # This method will check all your tables and columns and print tables who have "*_id" columns whose values are not integer
+    def check_id_columns_for_non_integers
+      puts tables
+    end
     
     # parallel dump, seems stable
     def dump_mysql
@@ -117,7 +124,7 @@ module MyMigrate
         end
         cmds
       end
-    
+     
     def load_postgres_indexes
       %(#{psql_conn} < ddl/postgres-idx.ddl)
     end

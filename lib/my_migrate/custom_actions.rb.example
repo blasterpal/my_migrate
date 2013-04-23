@@ -1,6 +1,12 @@
 module MyMigrate
   module CustomActions 
     
+    def fix_string_ids_to_integers
+      cmds = []
+      DbChecks.create_non_numeric_to_bigint_ddl(MyMigrate.ruby_mysql_conn,MyMigrate.config)
+      cmds << %( #{psql_conn}  < ./ddl/postgres_alter_non_numeric_ids.ddl )
+    end    
+
     def fix_timestamps_in_mysql_ddl
       %( sed "s/DEFAULT '1970-01-01 00:00:0[0,1]'//g" ddl/mysql.ddl > ddl/mysql.ddl)
     end

@@ -7,7 +7,7 @@ class DbChecks
     end 
     
     def non_number_id_columns(client,table_name)
-      (client.query "SHOW COLUMNS FROM #{table_name}").select {|col| col['Field'] =~ /.*_id$/ && (col['Type'] =~ /(text|varchar)/) }
+      (client.query "SHOW COLUMNS FROM #{table_name}").select {|col| col['Field'] =~ /.*(_id|_uid)$/ && (col['Type'] =~ /(text|varchar)/) }
     end
 
     def look_for_ids(client,tables)

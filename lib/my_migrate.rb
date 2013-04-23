@@ -40,7 +40,20 @@ module MyMigrate
     File.open('./ddl/non_numberic_id_columns.yaml','w') do |f|
       f << pp(r.to_yaml)
     end
-    puts "Report written to ./ddl/non_numberic_id_columns.txt"
+    puts "Report written to ./ddl/non_numberic_id_columns.yaml"
   end
+
+  def self.create_non_numeric_to_bigint_ddl
+    r = DbChecks.check_for_non_numeric_ids(MyMigrate.ruby_mysql_conn)
+    statements = []
+    File.open('./ddl/postgres_alter_non_numeric_ids.ddl','w') do |f|
+      r.each do |table|
+        table[1].each do |column|
+          f << "ALTER TABLE #{table[0]} ALTER COLUMN #{column['Field']} TYPE bigint USING CAST (#{column['Field']} as bigint);\n"
+        end
+      end
+    end
+    puts "File ./ddl/postgres_alter_non_numeric_ids.ddl created."
+  end 
 
 end

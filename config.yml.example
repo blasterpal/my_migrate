@@ -30,3 +30,8 @@ actions_set:
   - load_csvs
   - load_postgres_indexes
 
+columns_to_skip_auto_integer_conversion:
+  facebook_ads: 
+    - redirect_id
+    - foo_bar
+

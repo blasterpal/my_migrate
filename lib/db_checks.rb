@@ -51,6 +51,39 @@ class DbChecks
       end
       puts "File ./ddl/postgres_alter_non_numeric_ids.ddl created."
     end 
+    
+    def create_non_numeric_to_bigint_ddl_mysql(client,config={})
+      r = DbChecks.check_for_non_numeric_ids(client,config)
+      statements = []
+      File.open('./ddl/mysql_alter_non_numeric_ids.ddl','w') do |f|
+        r.each do |table|
+          table[1].each do |column|
+            f << "ALTER TABLE #{table[0]} MODIFY #{column['Field']} BIGINT UNSIGNED;\n"
+          end
+        end
+      end
+      puts "File ./ddl/mysql_alter_non_numeric_ids.ddl created."
+    end 
+
+
+    def _bigint_conversion_truncation_commands(client,config={})
+      r = DbChecks.check_for_non_numeric_ids(client,config)
+      statements = []
+      script = './ddl/biginit_conversion_truncate_check.sql'
+      File.open(script,'w') do |f|
+        r.each do |table|
+          tbl_name = table.first
+          columns = table[1].collect{|ea| ea['Field']}
+          columns_in_sel = columns.join('--')
+          sel_col = columns.collect {|ea| "CAST(#{ea} as UNSIGNED)"}
+          where_col = columns.collect {|ea| "CAST(#{ea} as UNSIGNED) = 0"}
+          table_sel = %(SELECT "TABLE:#{tbl_name}", "COLS:#{columns_in_sel}",  id, #{sel_col.join(',')} FROM #{tbl_name} WHERE #{where_col.join(' OR ')};\n)
+          # SELECT id,col1,col2, cast(col1 as unsigned), cast(col1 as unsigned) where cast(col1 as unsigned) < 1 AND cast(col1 as unsigned) < 1
+          f << table_sel
+        end
+      end
+      puts "File #{script}  created."
+    end 
 
   end
 end

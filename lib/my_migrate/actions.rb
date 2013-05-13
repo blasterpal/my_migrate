@@ -49,6 +49,9 @@ module MyMigrate
     end  
 
     def convert_mysql_ddl_to_postgres
+      puts %(NOTICE: You may see warnings like: 
+            lib/parse.hs:38:5: Warning: Pattern match(es) are overlapped In an equation for `translate': translate x = ...)
+      ask "This is NOT a neccesarily a failure. [press enter to continue]"
       %(cat ddl/mysql-cleaned.ddl | runghc lib/parse.hs > ddl/postgres.ddl)
     end
 
@@ -74,11 +77,15 @@ module MyMigrate
     
     # parallel dump, seems stable
     def dump_mysql
-      cmds = []
       this_command = %(cd dumps;)
       this_command += %( #{mysql_conn} -B -e 'SHOW TABLES' | sed -e '$!N; s/Tables_in_.*//' | )
       this_command += %( parallel --progress -j+0 "#{mysqldump_conn} --compatible=postgresql -T './' --fields-terminated-by='#{@config.source.fields_terminated_by}' --fields-enclosed-by='#{@config.source.fields_enclosed_by}' --tables {}" )
       this_command
+    end
+    
+    def check_bigint_conversion_truncation
+      cmd = %(cat ddl/biginit_conversion_truncate_check.sql |)
+      cmd += %( parallel --progress -j+0 #{mysql_conn} -e {})
     end
 
     def compress_mysql_dumps
@@ -103,15 +110,17 @@ module MyMigrate
       cmds = []
       path = File.join(Dir.pwd,'dumps')
       csvs = Dir["#{path}/*.txt"]
-      File.open('/tmp/mm_pg_load_csvs','w') do |f|
+      pg_csvs_to_load_file = '/tmp/mm_pg_load_csvs'
+      puts "Registering CSVs to load..."
+      File.open(pg_csvs_to_load_file ,'w') do |f|
         csvs.each do |csv|
-         puts "importing #{csv}..."
+         puts "Registered: #{csv}"
          #make a command file, easier than shell quoting escape hell
          psql_cmd = %(COPY #{File.basename(csv,'.txt')}  from '#{csv}' delimiter as '#{@config.source.fields_terminated_by}' NULL '#{@config.source.replace_null_string}' csv QUOTE as '#{@config.source.fields_enclosed_by}';) 
          f << "#{psql_cmd}\n"
         end
       end
-      cmds << %(cd dumps; cat /tmp/mm_pg_load_csvs| parallel --progress  -j+0 "#{psql_conn} -c {}") 
+      cmds << %(cd dumps; cat #{ pg_csvs_to_load_file}| parallel --progress  -j+0 "#{psql_conn} -c {}") 
     end
 
    def load_csvs
